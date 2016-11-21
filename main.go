@@ -46,7 +46,7 @@ func client(params ClientParams) {
 }
 
 func main()  {
-	var message uint16 = 123
+	var message uint16 = 125
 
 	publicKey := crypto.RSAKey{
 		N: 2281,
@@ -57,8 +57,8 @@ func main()  {
 		E: 1625,
 	}
 
-	encrypted := crypto.RSACipher(message, privateKey)
+	encrypted := crypto.RSACipher(message, publicKey)
 	fmt.Println("encrypted",encrypted)
-	decrypted := crypto.RSACipher(encrypted, publicKey)
+	decrypted := crypto.RSACipher(encrypted, privateKey)
 	fmt.Println("decrypted", decrypted)
 }

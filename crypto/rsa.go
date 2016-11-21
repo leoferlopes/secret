@@ -3,13 +3,13 @@ package crypto
 import "fmt"
 
 func RSACipher(message uint16, key RSAKey) uint16 {
-	fmt.Printf("%+v", key)
+	fmt.Printf("%+v\n", key)
 	return binExp(message, key.E, key.N)
 }
 
 func binExp(b uint16, e int, n uint16) uint16 {
-	var res uint = uint(b)
-	var y uint = 1
+	res := uint(b)
+	y := uint(1)
 
 	/* Caso base. */
 	if e == 0 {
