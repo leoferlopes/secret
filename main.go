@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"github.com/jessevdk/go-flags"
+	"github.com/leoferlopes/secret/crypto"
 )
 
 type ClientParams struct {
@@ -16,7 +17,7 @@ type ServerParams struct {
 	Port int    `short:"p" long:"port" description:"Port to listen" value-name:"PORT" required:"true"`
 }
 
-func main() {
+func _main() {
 	var serverParams ServerParams
 	var clientParams ClientParams
 
@@ -42,4 +43,22 @@ func server(params ServerParams) {
 
 func client(params ClientParams) {
 	fmt.Printf("%+v\n", params)
+}
+
+func main()  {
+	var message uint16 = 123
+
+	publicKey := crypto.RSAKey{
+		N: 2281,
+		E: 29,
+	}
+	privateKey := crypto.RSAKey{
+		N: 2281,
+		E: 1625,
+	}
+
+	encrypted := crypto.RSACipher(message, privateKey)
+	fmt.Println("encrypted",encrypted)
+	decrypted := crypto.RSACipher(encrypted, publicKey)
+	fmt.Println("decrypted", decrypted)
 }
