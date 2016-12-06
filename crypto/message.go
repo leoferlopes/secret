@@ -1,4 +1,4 @@
-package main
+package crypto
 
 import (
 	"hash/crc32"
@@ -30,7 +30,8 @@ func (m Message) macEncrypt(symmetricKey []byte) Message {
 	data := append([]byte{}, m...)
 	data = append(data, symmetricKey...)
 	hash := big.NewInt(int64(crc32.ChecksumIEEE(data)))
-	data = append(padding(hash.Bytes(), 4),m...)
+	data = append(padding(hash.Bytes(), 4), m...)
+	fmt.Println(padding(hash.Bytes(), 4))
 	return Message(data)
 }
 
@@ -42,8 +43,7 @@ func (m Message) macDecrypt(symmetricKey []byte) Message {
 	if hash == number(0).SetBytes(m[:4]).Int64() {
 		return Message(m[4:])
 	}
-	println(hash, number(0).SetBytes(m[:4]).Int64())
-	panic("dsds")
+	panic("Could not verify the message" + m.String())
 }
 
 func (m Message) rsaEncrypt(publicKey []byte) Message {
@@ -61,13 +61,21 @@ func (m Message) rsaDecrypt(privateKey []byte) Message {
 		c := number(0).Exp(number(0).SetBytes(m[index:index + 2]), number(0).SetBytes(privateKey[2:]), number(0).SetBytes(privateKey[:2]))
 		data = append(data, c.Bytes()...)
 	}
-
 	return Message(data)
 }
 
 func (m Message) Encrypt(symmetricKey []byte, publicKey []byte) Message {
-	return m.macEncrypt(symmetricKey).xor(symmetricKey).rsaEncrypt(publicKey)
+	size := len(m) + 5 + len(symmetricKey) - 1;
+	size -= (size % (len(symmetricKey) + 5));
+	s := Message(padding(m, size))
+	s = s.macEncrypt(symmetricKey)
+	s = s.xor(symmetricKey)
+	//s = s.rsaEncrypt(publicKey)
+	return s
 }
 func (m Message) Decrypt(symmetricKey []byte, secretKey []byte) Message {
-	return m.rsaDecrypt(secretKey).xor(symmetricKey).macDecrypt(symmetricKey)
+	//s := m.rsaDecrypt(secretKey)
+	s := m.xor(symmetricKey)
+	s = s.macDecrypt(symmetricKey)
+	return s
 }
