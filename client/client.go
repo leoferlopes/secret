@@ -4,7 +4,7 @@ import (
 	"github.com/leoferlopes/secret/types"
 	"net"
 	"os"
-	"fmt"
+	"github.com/leoferlopes/secret/util"
 )
 
 func check(e error) {
@@ -37,18 +37,9 @@ func (client *Client) handleConnection(conn net.Conn) {
 	// read in input from stdin
 	file, err := os.Open(client.File)
 	check(err)
-	buf := make([]byte, 1024)
 
-	// Read the incoming connection into the buffer.
-	for length, err := file.Read(buf); length > 0; length, err = file.Read(buf) {
-		if err != nil {
-			fmt.Println("Error reading:", err.Error())
-		}
+	util.TransferBuffer(file, conn)
 
-		// Write the buffer into the file
-		conn.Write(buf[0:length])
-		check(err)
-	}
 	file.Close()
 	conn.Close()
 }

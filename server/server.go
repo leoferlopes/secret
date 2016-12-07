@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"github.com/leoferlopes/secret/types"
+	"github.com/leoferlopes/secret/util"
 )
 
 type Server struct {
@@ -37,29 +38,16 @@ func (server *Server) Run() {
 }
 
 func (server *Server) handleConnection(conn net.Conn) {
-	// Make a buffer to hold incoming data.
-	buf := make([]byte, 1024)
-
 	// Open file to append
 	file, err := os.Create(server.File)
 	defer file.Close()
 
 	check(err)
 
-	// Read the incoming connection into the buffer.
-	for length, err := conn.Read(buf); length > 0; length, err = conn.Read(buf) {
-		if err != nil {
-			fmt.Println("Error reading:", err.Error())
-		}
+	// Transfer bytes from conn to file
+	util.TransferBuffer(conn, file)
 
-		// Write the buffer into the file
-		file.Write(buf[0:length])
-		check(err)
-	}
+	// Close file and connection
 	file.Close()
-
-	// Send a response back to person contacting us.
-	conn.Write([]byte("Message received.\n"))
-	// Close the connection when you're done with it.
 	conn.Close()
 }

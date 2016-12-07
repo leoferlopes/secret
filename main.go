@@ -44,7 +44,7 @@ func runServer(params types.ServerParams) {
 
 func runClient(params types.ClientParams) {
 	secretClient := client.NewClient(params)
-	fmt.Printf("Sending file %s to server %s", secretClient.File, secretClient.Server)
+	fmt.Printf("Sending file %s to server %s\n", secretClient.File, secretClient.Server)
 	secretClient.Run()
 }
 
