@@ -7,25 +7,15 @@ import (
 	"github.com/jessevdk/go-flags"
 	"os"
 	"github.com/leoferlopes/secret/crypto"
+	"github.com/leoferlopes/secret/server"
+	"github.com/leoferlopes/secret/types"
+	"github.com/leoferlopes/secret/client"
 )
 
-type ClientParams struct {
-	File   string `short:"f" long:"file" description:"File to transfer to server" value-name:"FILE" required:"true"`
-	Server string `short:"s" long:"server" description:"Server address" value-name:"SERVER" required:"true"`
-}
-
-type ServerParams struct {
-	File string `short:"f" long:"file" description:"File to transfer to server" value-name:"FILE" required:"true"`
-	Port int    `short:"p" long:"port" description:"Port to listen" value-name:"PORT" required:"true"`
-}
-
-type TestParams struct {
-}
-
 func main() {
-	var serverParams ServerParams
-	var clientParams ClientParams
-	var testParams TestParams
+	var serverParams types.ServerParams
+	var clientParams types.ClientParams
+	var testParams types.TestParams
 
 	args := flags.NewNamedParser("secret", flags.Options(flags.Default))
 	args.AddCommand("client", "Run secret client", "Run secret client", &clientParams)
@@ -38,20 +28,24 @@ func main() {
 
 	switch args.Active.Name {
 	case "server":
-		server(serverParams)
+		runServer(serverParams)
 	case "client":
-		client(clientParams)
+		runClient(clientParams)
 	case "test":
 		test()
 	}
 }
 
-func server(params ServerParams) {
-	fmt.Printf("%+v\n", params)
+func runServer(params types.ServerParams) {
+	secretServer := server.NewServer(params)
+	fmt.Printf("Listening %s...\n", secretServer.Bind)
+	secretServer.Run()
 }
 
-func client(params ClientParams) {
-	fmt.Printf("%+v\n", params)
+func runClient(params types.ClientParams) {
+	secretClient := client.NewClient(params)
+	fmt.Printf("Sending file %s to server %s", secretClient.File, secretClient.Server)
+	secretClient.Run()
 }
 
 func test() {
