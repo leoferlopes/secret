@@ -1,9 +1,11 @@
+// A concurrent prime sieve
+
 package main
 
 import (
 	"fmt"
-	"os"
 	"github.com/jessevdk/go-flags"
+	"os"
 	"github.com/leoferlopes/secret/crypto"
 )
 
@@ -17,13 +19,18 @@ type ServerParams struct {
 	Port int    `short:"p" long:"port" description:"Port to listen" value-name:"PORT" required:"true"`
 }
 
-func _main() {
+type TestParams struct {
+}
+
+func main() {
 	var serverParams ServerParams
 	var clientParams ClientParams
+	var testParams TestParams
 
 	args := flags.NewNamedParser("secret", flags.Options(flags.Default))
 	args.AddCommand("client", "Run secret client", "Run secret client", &clientParams)
 	args.AddCommand("server", "Run secret server", "Run secret client", &serverParams)
+	args.AddCommand("test", "Run secret test", "Run secret test", &testParams)
 	_, err := args.ParseArgs(os.Args[1:])
 	if err != nil {
 		os.Exit(2)
@@ -34,6 +41,8 @@ func _main() {
 		server(serverParams)
 	case "client":
 		client(clientParams)
+	case "test":
+		test()
 	}
 }
 
@@ -45,20 +54,12 @@ func client(params ClientParams) {
 	fmt.Printf("%+v\n", params)
 }
 
-func main()  {
-	var message uint16 = 125
-
-	publicKey := crypto.RSAKey{
-		N: 2281,
-		E: 29,
-	}
-	privateKey := crypto.RSAKey{
-		N: 2281,
-		E: 1625,
-	}
-
-	encrypted := crypto.RSACipher(message, publicKey)
-	fmt.Println("encrypted",encrypted)
-	decrypted := crypto.RSACipher(encrypted, privateKey)
-	fmt.Println("decrypted", decrypted)
+func test() {
+	symmetricKey := []byte("123")
+	rsa := crypto.NewRSA()
+	m := crypto.Message([]byte("banana"))
+	fmt.Println(m.String())
+	s := m.Encrypt(symmetricKey, rsa.PublicKey)
+	t := s.Decrypt(symmetricKey, rsa.SecretKey)
+	fmt.Println(t.String())
 }

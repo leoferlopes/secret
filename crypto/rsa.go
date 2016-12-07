@@ -1,44 +1,40 @@
 package crypto
 
-import "fmt"
+import "math/big"
 
-func RSACipher(message uint16, key RSAKey) uint16 {
-	fmt.Printf("%+v\n", key)
-	return binExp(message, key.E, key.N)
+type RSA struct {
+	PublicKey []byte
+	SecretKey []byte
 }
 
-func binExp(b uint16, e int, n uint16) uint16 {
-	res := uint(b)
-	y := uint(1)
+func NewRSA() *RSA {
+	p := randomPrime()
+	q := randomPrime()
 
-	/* Caso base. */
-	if e == 0 {
-		return 1
+	for number().Sub(p, q).Uint64() == 0 {
+		q = randomPrime()
 	}
-
-	for e > 1 {
-		if e & 1 != 0 {
-			/*
-			 * Caso especial: expoente é ímpar.
-			 * Acumular uma potência de 'res' em 'y'.
-			 */
-			y = (y * res) % uint(n)
-
-			e = e - 1
+	n := number().Mul(q, p)
+	z := number().Mul(number().Sub(p, number(1)), number().Sub(q, number(1)))
+	e := randomPrime()
+	for number().Sub(e, n).Sign() != -1 {
+		e = randomPrime()
+	}
+	d := randomPrime()
+	for true {
+		ed := number()
+		ed = number().Mul(e, d)
+		m := number().Mod(ed, z)
+		if m.Uint64() == 1 {
+			break
 		}
-
-		/*
-		 * Elevamos 'res' ao quadrado, dividimos expoente por 2.
-		 */
-		res = (res * res) % uint(n)
-
-		e = e / 2
+		d = d.Add(d, big.NewInt(1))
 	}
-
-	return uint16((res * y) % uint(n))
-}
-
-type RSAKey struct {
-	N uint16
-	E int
+	nb := padding(n.Bytes(), 2)
+	db := padding(d.Bytes(), 2)
+	eb := padding(e.Bytes(), 2)
+	return &RSA{
+		PublicKey: append(nb, eb...),
+		SecretKey: append(padding(n.Bytes(), 2), db...),
+	}
 }
