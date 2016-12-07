@@ -3,11 +3,24 @@ package crypto
 import "math/big"
 
 type RSA struct {
-	PublicKey []byte
-	SecretKey []byte
+	PublicKey     []byte
+	SecretKey     []byte
+	componentSize int
 }
 
-func NewRSA() *RSA {
+func (r *RSA) N() []byte {
+	return r.PublicKey[:r.componentSize]
+}
+
+func (r *RSA) E() []byte {
+	return r.PublicKey[r.componentSize:]
+}
+
+func (r *RSA) D() []byte {
+	return r.SecretKey[r.componentSize:]
+}
+
+func NewRSA(size int) *RSA {
 	p := randomPrime()
 	q := randomPrime()
 
@@ -30,11 +43,12 @@ func NewRSA() *RSA {
 		}
 		d = d.Add(d, big.NewInt(1))
 	}
-	nb := padding(n.Bytes(), 2)
-	db := padding(d.Bytes(), 2)
-	eb := padding(e.Bytes(), 2)
+	nb := padding(n.Bytes(), size)
+	db := padding(d.Bytes(), size)
+	eb := padding(e.Bytes(), size)
 	return &RSA{
 		PublicKey: append(nb, eb...),
 		SecretKey: append(padding(n.Bytes(), 2), db...),
+		componentSize: size,
 	}
 }
