@@ -25,7 +25,6 @@ func randomPrime() *big.Int {
 	return p
 }
 
-
 func number(n... int) *big.Int {
 	return big.NewInt(int64(append(n, 0)[0]))
 }
