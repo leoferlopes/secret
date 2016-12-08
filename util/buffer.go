@@ -1,11 +1,12 @@
 package util
 
-func TransferBuffer(in stream, out stream)  {
+func TransferBuffer(in stream, out stream) {
 	// Make a buffer to hold incoming data.
 	buf := make([]byte, 1024)
 
 	// Read the input into the buffer.
 	for length, err := in.Read(buf); length > 0; length, err = in.Read(buf) {
+		println(length)
 		if err != nil {
 			panic(err)
 		}
@@ -13,6 +14,7 @@ func TransferBuffer(in stream, out stream)  {
 		// Write the buffer into the output
 		out.Write(buf[0:length])
 	}
+	println("dsd")
 
 }
 
