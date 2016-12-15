@@ -7,5 +7,3 @@ type CryptoMessage interface {
 	SetBytes([]byte)
 	String() string
 }
-
-type Key []byte
