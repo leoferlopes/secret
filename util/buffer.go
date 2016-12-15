@@ -1,5 +1,10 @@
 package util
 
+import (
+	"errors"
+	"fmt"
+)
+
 type Stream interface {
 	// Read reads data from the connection.
 	// Read can be made to time out and return a Error with Timeout() == true
@@ -22,7 +27,6 @@ func TransferEncryptBuffer(in Stream, out Stream, cypher Cypher) {
 
 	sequence := uint64(0)
 	for length, err := in.Read(buf); length > 0; length, err = in.Read(buf) {
-		println(length)
 		if err != nil {
 			panic(err)
 		}
@@ -38,14 +42,13 @@ func TransferDecryptBuffer(in Stream, out Stream, cypher Cypher) {
 
 	sequence := uint64(0)
 	for length, err := in.Read(buf); length > 0; length, err = in.Read(buf) {
-		println(length)
 		if err != nil {
 			panic(err)
 		}
 		bytes, seq := cypher.Decrypt(buf[0:length])
 		if seq != sequence {
-			println("seq", seq)
-			println("sequence", sequence)
+			message := fmt.Sprintf("Wrong sequence number. Expected: %s, Found: %s", sequence, seq)
+			panic(errors.New(message))
 		}
 
 		out.Write(bytes)

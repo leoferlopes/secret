@@ -69,15 +69,14 @@ func _test() {
 
 func test() {
 	cypher := crypto.NewStandartCypher()
-	fmt.Printf("cypher: %+v\n", *cypher.RSA)
-	bytes := []byte("myBanana")
-	fmt.Println("string", string(bytes))
-	fmt.Println("bytes", bytes)
-	sequence := uint64(512)
+	bytes := []byte("Lorem ipsum dolor sit amet.")
+	fmt.Println("text:", string(bytes))
+	fmt.Println("bytes:", bytes)
+	sequence := uint64(1)
 	encrypted := cypher.Encrypt(bytes, sequence)
-	fmt.Println("encrypted", encrypted)
+	fmt.Println("encrypted:", encrypted)
 	decrypted, seq := cypher.Decrypt(encrypted)
-	fmt.Println("decrypted", decrypted)
-	fmt.Println("seq", seq)
-	fmt.Println("string", string(decrypted))
+	fmt.Println("decrypted:", decrypted)
+	fmt.Println("sequence", seq)
+	fmt.Println("text:", string(decrypted))
 }
