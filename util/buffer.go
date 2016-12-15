@@ -18,7 +18,7 @@ type Cypher interface {
 }
 
 func TransferEncryptBuffer(in Stream, out Stream, cypher Cypher) {
-	buf := make([]byte, 504)
+	buf := make([]byte, 500)
 
 	sequence := uint64(0)
 	for length, err := in.Read(buf); length > 0; length, err = in.Read(buf) {

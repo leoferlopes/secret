@@ -10,8 +10,8 @@ type StandartCypher struct {
 }
 
 func (cypher *StandartCypher) Encrypt(b []byte, sequence uint64) []byte {
-	s := make([]byte, 8)
-	binary.LittleEndian.PutUint64(s, sequence)
+	s := make([]byte, 4)
+	binary.LittleEndian.PutUint32(s, uint32(sequence))
 	fmt.Println("Encrypt.s", s)
 	bytes := append(b, s...)
 	m := NewMessage(bytes)
@@ -31,11 +31,11 @@ func (cypher *StandartCypher) Decrypt(b []byte) ([]byte, uint64) {
 		panic(err)
 	}
 	bytes := m.Bytes()
-	s := bytes[len(bytes) - 8:]
+	s := bytes[len(bytes)-4:]
 	fmt.Println("Decrypt.s", s)
-	sequence := binary.LittleEndian.Uint64(s)
+	sequence := binary.LittleEndian.Uint32(s)
 	fmt.Println("Decrypt.sequence", sequence)
-	return bytes[:len(bytes) - 8], sequence
+	return bytes[:len(bytes)-4], uint64(sequence)
 }
 
 func NewStandartCypher() *StandartCypher {
