@@ -48,25 +48,6 @@ func runClient(params types.ClientParams) {
 	secretClient.Run()
 }
 
-func _test() {
-	m := crypto.NewMessage([]byte("banana"))
-	fmt.Println(m.String())
-	k := crypto.NewXOR()
-	rsa := crypto.NewRSA(4)
-	s := crypto.NewRSAMessage(crypto.NewXORMessage(crypto.NewMACMessage(m), k), rsa)
-	ss, err := s.Encrypt()
-	if err != nil {
-		panic(err.Error())
-	}
-	fmt.Println(ss.Bytes())
-	sss := crypto.NewMACMessage(crypto.NewXORMessage(crypto.NewRSAMessage(ss, rsa), k))
-	sss, err = sss.Decrypt()
-	if err != nil {
-		panic(err.Error())
-	}
-	fmt.Println(sss.String())
-}
-
 func test() {
 	cypher := crypto.NewStandartCypher()
 	bytes := []byte("Lorem ipsum dolor sit amet.")
