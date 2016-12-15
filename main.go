@@ -9,6 +9,7 @@ import (
 	"github.com/leoferlopes/secret/server"
 	"github.com/leoferlopes/secret/types"
 	"os"
+	"github.com/leoferlopes/secret/crypto"
 )
 
 func main() {
@@ -48,20 +49,15 @@ func runClient(params types.ClientParams) {
 }
 
 func test() {
-	// 	m := crypto.NewMessage([]byte("banana"))
-	// 	fmt.Println(m.String())
-	// 	k := crypto.Key([]byte("maca"))
-	// 	rsa := crypto.NewRSA(4)
-	// 	s := crypto.NewRSAMessage(crypto.NewXORMessage(crypto.NewMACMessage(m, k), k), rsa)
-	// 	ss, err := s.Encrypt()
-	// 	if err != nil {
-	// 		panic(err.Error())
-	// 	}
-	// 	fmt.Println(ss.Bytes())
-	// 	sss := crypto.NewMACMessage(crypto.NewXORMessage(crypto.NewRSAMessage(ss, rsa), k), k)
-	// 	sss, err = sss.Decrypt()
-	// 	if err != nil {
-	// 		panic(err.Error())
-	// 	}
-	// 	fmt.Println(sss.String())
+	cypher := crypto.NewStandartCypher()
+	bytes := []byte("Lorem ipsum dolor sit amet.")
+	fmt.Println("text:", string(bytes))
+	fmt.Println("bytes:", bytes)
+	sequence := uint64(1)
+	encrypted := cypher.Encrypt(bytes, sequence)
+	fmt.Println("encrypted:", encrypted)
+	decrypted, seq := cypher.Decrypt(encrypted)
+	fmt.Println("decrypted:", decrypted)
+	fmt.Println("sequence", seq)
+	fmt.Println("text:", string(decrypted))
 }

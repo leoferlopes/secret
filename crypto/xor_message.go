@@ -2,7 +2,7 @@ package crypto
 
 type XORMessage struct {
 	CryptoMessage
-	key Key
+	XOR
 }
 
 func (m *XORMessage) Encrypt() (CryptoMessage, error) {
@@ -11,12 +11,12 @@ func (m *XORMessage) Encrypt() (CryptoMessage, error) {
 		return nil, err
 	}
 	bytes := s.Bytes()
-	size := len(bytes) + len(m.key) - 1;
-	size -= (size % len(m.key));
+	size := len(bytes) + len(m.Key) - 1;
+	size -= (size % len(m.Key));
 	message := padding(bytes, size)
 	for i := 0; i < len(message); {
-		for j := 0; j < len(m.key); j++ {
-			message[i] = message[i] ^ m.key[j]
+		for j := 0; j < len(m.Key); j++ {
+			message[i] = message[i] ^ m.Key[j]
 			i++
 		}
 	}
@@ -30,13 +30,13 @@ func (m *XORMessage) Decrypt() (CryptoMessage, error) {
 		return nil, err
 	}
 	bytes := s.Bytes()
-	size := len(bytes) - 8 + len(m.key) - 1;
-	size -= (size % len(m.key));
+	size := len(bytes) - 8 + len(m.Key) - 1;
+	size -= (size % len(m.Key));
 	actualSize := int(number().SetBytes(bytes[len(bytes) - 8:]).Int64())
 	message := append([]byte{}, padding(bytes[:len(bytes) - 8], size)...)
 	for i := 0; i < len(message); {
-		for j := 0; j < len(m.key); j++ {
-			message[i] = message[i] ^ m.key[j]
+		for j := 0; j < len(m.Key); j++ {
+			message[i] = message[i] ^ m.Key[j]
 			i++
 		}
 	}
@@ -44,10 +44,10 @@ func (m *XORMessage) Decrypt() (CryptoMessage, error) {
 	return s, nil
 }
 
-func NewXORMessage(message CryptoMessage, symmetricKey Key) CryptoMessage {
+func NewXORMessage(message CryptoMessage, xor *XOR) CryptoMessage {
 	return &XORMessage{
 		CryptoMessage: message,
-		key: symmetricKey,
+		XOR: *xor,
 	}
 }
 
