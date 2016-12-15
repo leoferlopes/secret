@@ -5,29 +5,28 @@ Inteiramente escrito na linguagem de programação [**go**](https://golang.org/)
 Nosso protocolo, chamado *secret*, possui o seguintes passos:
 
 1. Uma chave simetrica e secreta é compartilhada previamente entre as partes;
-1. Inicia-se um pedido de conexão TCP na porta 1280;
-1. O destino envia um nounce de 16 bytes criptografado com a chave simetrica;
-1. A origem recebe o nounce cifrado o decifra e troca os dois bytes de lugar, o primeiro byte passa a ser o segundo e o segundo passa a ser o primeiro, o cifra novamento e o envia de volta ao destino;
-1. O destino decifra o nounce e inverte os bytes novamente e verifica se é o mesmo que foi enviado, caso seja ele envia sua chave publica para a origim cifrada com a chave simetrica.
-1. A origem passa a enviar mensagens para o destino cifradas com a chave simetrica e a chave publica do destino;
-1. Quando a conexão deseja ser fechada é enviada um comando especial de fechamento da conexão;
-
-**Obs:** Todas as mensagem incluem um MAC antes de serem cifradas
+1. Inicia-se um pedido de conexão TCP na porta que o servidor estiver escutando;
+1. O cliente cria um mensagem e adiciona o numero de sequencia ao final.
+1. É calculado o MAC da mensagem
+1. A mensagem+sequencia+MAC são cifradas pelo RSA e enviadas
+1. O servidor decifra a mensagem pelo RSA
+1. O servidor verfica o MAC da mensagem
+1. O servidor verfica o número de sequência da mensagem
 
 ## Garantias
 
 Nosso protocolo garante os seguintes aspectos:
 
 ### Privacidade
-Utilizamos uma criptografia de chave simetrica, que foi previamente compartilhada entre as partes, para assegura que uma parte terceira não possa compreender a mensagem, utilizamos o algoritmo baseado em XOR + uma implementação de RSA simplificado
+
+Utilizamos uma criptografia de chave asssimétrica, que foi previamente compartilhada entre as partes, para assegurar que uma parte terceira não possa compreender a mensagem.
 
 ### Autenticidade
-Ao iniciarmos a conexão é necessário o envio de um nounce, cifrado com a chave simetrica que apenas as partes interessadas possuem
 
-`@TODO: enviar um nounce`
+Além da criptografia assimétrica que garante que a mensagem foi gerada pelo portador da chave previamente compartilhada, a mensagem é cifrada com um número de sequência para evitar ataques de repetição.
 
 ### Integridade
-Antes de ciframos a mensagem geramos um MAC da mensagem+chave simetrica usando como algoritmo de hash o CRC e anexamos na mensagem.
+Antes de ciframos a mensagem geramos um MAC da mensagem+sequencia+chave usando como algoritmo de hash o CRC e anexamos na mensagem.
 
 ## Descrição do secret:
 
@@ -41,10 +40,10 @@ Temos como principais estruturas:
 
 *   **CryptoMessage**: Interface que define os comportamentos das mensagens
 *   **MacMessage**: Estrutura que encapsula uma CryptoMessage qualquer e adiciona uma verificação de um MAC usando CRC
-*	**RSAMessage**: Estrutura que encapsula uma CryptoMessage qualquer e cifra usando RSA com uma chave pre gerada
-*	**XORMessage**: Estrutura que encapsula uma CryptoMessage qualquer e cifra usando XOR com uma chave pre gerada
+*	**RSAMessage**: Estrutura que encapsula uma CryptoMessage qualquer e cifra usando RSA com uma chave pré gerada
 *	**RSA**: Estrura que representa uma chave RSA
 *	**CRC**: Implementação de um CRC de oito bits
+*   **StandartCypher**: Principal estrutura para o funcionamento do protocolo, responsável por cifrar e decifrar a mensagem, utilizando as estruturas descritas acima.
 
 Nossa arquitetura se baseia em um sistema em camadas assim, podemos aplicar qualquer combinação de cifras  que desejarmos
 
@@ -52,13 +51,13 @@ Nossa arquitetura se baseia em um sistema em camadas assim, podemos aplicar qual
 
 * Instale go na máquina;
 
-    * Debian
+    * Debian, Ubuntu e outros sistemas com *apt-get*
 
     ```bash
     # apt-get install golang
     ```
 
-    * Fedora
+    * Fedora, CentOS, RHEL e outros sistemas com *yum*
 
     ```bash
     # yum install golang
