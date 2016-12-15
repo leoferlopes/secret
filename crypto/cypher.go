@@ -18,6 +18,7 @@ func (cypher *StandartCypher) Encrypt(b []byte, sequence uint64) []byte {
 	m = NewMACMessage(m)
 	m = NewRSAMessage(m, cypher.RSA)
 	m, _ = m.Encrypt()
+	fmt.Println("Encrypt.m.Bytes()", m.Bytes())
 	return m.Bytes()
 }
 
@@ -25,17 +26,21 @@ func (cypher *StandartCypher) Decrypt(b []byte) ([]byte, uint64) {
 	m := NewMessage(b)
 	m = NewRSAMessage(m, cypher.RSA)
 	m = NewMACMessage(m)
-	m, _ = m.Decrypt()
+	m, err := m.Decrypt()
+	if err != nil {
+		fmt.Println("Erro ao decriptar mensagem")
+		panic(err)
+	}
 	bytes := m.Bytes()
-	s := bytes[len(bytes)-8:]
+	s := bytes[len(bytes) - 8:]
 	fmt.Println("Decrypt.s", s)
 	sequence := binary.LittleEndian.Uint64(s)
 	fmt.Println("Decrypt.sequence", sequence)
-	return bytes[:len(bytes)-8], sequence
+	return bytes[:len(bytes) - 8], sequence
 }
 
-func NewStandartCypher() *StandartCypher{
+func NewStandartCypher() *StandartCypher {
 	return &StandartCypher{
-		RSA: NewRSA(16),
+		RSA: NewRSAHardcoded(),
 	}
 }

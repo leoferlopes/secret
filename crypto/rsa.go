@@ -1,6 +1,8 @@
 package crypto
 
-import "math/big"
+import (
+	"math/big"
+)
 
 type RSA struct {
 	PublicKey     []byte
@@ -50,5 +52,13 @@ func NewRSA(size int) *RSA {
 		PublicKey: append(nb, eb...),
 		SecretKey: append(padding(n.Bytes(), 2), db...),
 		componentSize: size,
+	}
+}
+
+func NewRSAHardcoded() *RSA {
+	return &RSA{
+		PublicKey: []byte{0, 0, 0, 0, 0, 0, 218, 165, 0, 0, 0, 0, 0, 0, 0, 233,},
+		SecretKey: []byte{218, 165, 0, 0, 0, 0, 0, 0, 146, 21,},
+		componentSize: 8,
 	}
 }

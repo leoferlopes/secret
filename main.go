@@ -69,6 +69,7 @@ func _test() {
 
 func test() {
 	cypher := crypto.NewStandartCypher()
+	fmt.Printf("cypher: %+v\n", *cypher.RSA)
 	bytes := []byte("myBanana")
 	fmt.Println("string", string(bytes))
 	fmt.Println("bytes", bytes)

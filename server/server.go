@@ -42,7 +42,7 @@ func (server *Server) handleConnection(conn net.Conn) {
 	file, err := os.Create(server.File)
 	check(err)
 	cypher := crypto.NewStandartCypher()
-	util.TransferDecryptBuffer(file, conn, cypher)
+	util.TransferDecryptBuffer(conn, file, cypher)
 	file.Close()
 	conn.Close()
 }

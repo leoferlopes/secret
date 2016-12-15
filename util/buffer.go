@@ -1,23 +1,5 @@
 package util
 
-func TransferBuffer(in Stream, out Stream) {
-	// Make a buffer to hold incoming data.
-	buf := make([]byte, 1024)
-
-	// Read the input into the buffer.
-	for length, err := in.Read(buf); length > 0; length, err = in.Read(buf) {
-		println(length)
-		if err != nil {
-			panic(err)
-		}
-
-		// Write the buffer into the output
-		out.Write(buf[0:length])
-	}
-	println("dsd")
-
-}
-
 type Stream interface {
 	// Read reads data from the connection.
 	// Read can be made to time out and return a Error with Timeout() == true
