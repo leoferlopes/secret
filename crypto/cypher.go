@@ -28,7 +28,6 @@ func (cypher *StandartCypher) Decrypt(b []byte) ([]byte, uint64) {
 	m = NewMACMessage(m)
 	m, err := m.Decrypt()
 	if err != nil {
-		fmt.Println("Erro ao decriptar mensagem")
 		panic(err)
 	}
 	bytes := m.Bytes()
